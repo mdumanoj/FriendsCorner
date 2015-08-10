@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+					 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+					 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+					 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+					 http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+					 http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+					 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing 
+		infrastructure -->
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.fc.controller" /> 
+		<context:component-scan base-package="com.fc.service.impl" /> 
+		<context:component-scan base-package="com.fc.dao.impl" /> 
+
+
+	<!-- <mvc:resources mapping="/css/**" location="/resources/css/" /> <mvc:resources 
+		mapping="/js/**" location="/resources/js/" /> <mvc:resources mapping="/img/**" 
+		location="/resources/img/" />
+
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+		<property name="prefix"> <value>/WEB-INF/pages/</value> </property> <property 
+		name="suffix"> <value>.jsp</value> </property> </bean>
+ -->
+	<!-- START : Dozer mapping configuration -->
+	<!-- <bean id="objectTransformerUtil" class="com.fc.util.ObjectTransformerUtil">
+		<property name="mappingFiles">
+			<list>
+				<value>dozer/fc.xml</value>
+				
+
+			</list>
+		</property>
+	</bean>
+ -->	<!-- END : Dozer mapping configuration -->
+
+	<!-- START : Property files placeholder -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		lazy-init="false">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- <bean id="configProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location">
+			<value>classpath:shopinn.properties</value>
+		</property>
+	</bean> -->
+
+	<!-- <bean class="com.shopinn.util.ResourceProperty" factory-method="setInstance"
+		autowire="default" scope="singleton">
+		<constructor-arg ref="configProperties" />
+	</bean> -->
+	<!-- END : Property files placeholder -->
+
+	<!-- START : JPA related configuration -->
+	<jpa:repositories base-package="com.fc.model" />
+
+	<bean id="jpaVendorAdapter"
+		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="showSql" value="true" />
+		<property name="generateDdl" value="false" />
+		<property name="database" value="MYSQL" />
+	</bean>
+
+	<!-- JPA -->
+	<bean
+		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+		<property name="persistenceUnitName" value="fcApp" />
+		<!-- spring based scanning for entity classes -->
+		<property name="packagesToScan" value="com.fc.model" />
+	</bean>
+	<tx:annotation-driven />
+	
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close" p:driverClassName="${jdbc.driverClassName}"
+		p:url="${jdbc.databaseurl}" p:username="${jdbc.username}" p:password="${jdbc.password}" />
+	<!-- Should be defined last! -->
+	<mvc:annotation-driven />
+</beans>
